@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: bluetrace-db
+    environment:
+      POSTGRES_USER: bluetrace
+      POSTGRES_PASSWORD: bluetrace
+      POSTGRES_DB: bluetrace
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bluetrace"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: bluetrace-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bluetrace-api
+    ports:
+      - "8080:8080"
+    environment:
+      POSTGRES_DSN: postgresql://bluetrace:bluetrace@db:5432/bluetrace
+      REDIS_URL: redis://redis:6379/0
+      LOG_LEVEL: INFO
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./app:/app/app
+      - ./alembic:/app/alembic
+    command: >
+      sh -c "
+        poetry run alembic upgrade head &&
+        gunicorn app.main:app -c gunicorn_conf.py
+      "
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bluetrace-worker
+    environment:
+      POSTGRES_DSN: postgresql://bluetrace:bluetrace@db:5432/bluetrace
+      REDIS_URL: redis://redis:6379/0
+      LOG_LEVEL: INFO
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./app:/app/app
+    command: poetry run dramatiq app.ingestion.scheduler
+
+volumes:
+  postgres_data:
+

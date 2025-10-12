@@ -1,0 +1,144 @@
+import Link from 'next/link'
+
+# Quickstart Guide
+
+Get started with BlueTrace API in minutes.
+
+## 1. Get an API Key
+
+Contact your administrator to get an API key, or if you're running locally:
+
+```bash
+cd backend
+make seed
+```
+
+This will create an admin key and print it to the console. **Save this key** - it's only shown once!
+
+## 2. Make Your First Request
+
+Test the health endpoint (no auth required):
+
+```bash
+curl http://localhost:8080/v1/health
+```
+
+Now try an authenticated request:
+
+```bash
+export BLUETRACE_API_KEY="your_key_here"
+
+curl -H "X-Api-Key: $BLUETRACE_API_KEY" \
+  "http://localhost:8080/v1/tides?station_id=DEMO001&start=2024-01-01T00:00:00Z&end=2024-12-31T23:59:59Z"
+```
+
+## 3. Explore the Data
+
+### Tides
+
+Get water level measurements:
+
+```bash
+curl -H "X-Api-Key: $BLUETRACE_API_KEY" \
+  "http://localhost:8080/v1/tides?station_id=DEMO001&start=2024-01-01T00:00:00Z&end=2024-01-02T00:00:00Z"
+```
+
+### Sea Surface Temperature
+
+Get SST data near a location:
+
+```bash
+curl -H "X-Api-Key: $BLUETRACE_API_KEY" \
+  "http://localhost:8080/v1/sst?lat=40.0&lon=-74.0&start=2024-01-01T00:00:00Z&end=2024-01-02T00:00:00Z"
+```
+
+### Ocean Currents
+
+Get current vectors in a bounding box:
+
+```bash
+curl -H "X-Api-Key: $BLUETRACE_API_KEY" \
+  "http://localhost:8080/v1/currents?bbox=-75,38,-74,39&time=2024-01-01T12:00:00Z"
+```
+
+### Turbidity
+
+Get water clarity measurements:
+
+```bash
+curl -H "X-Api-Key: $BLUETRACE_API_KEY" \
+  "http://localhost:8080/v1/turbidity?bbox=-75,38,-74,39&start=2024-01-01T00:00:00Z&end=2024-01-02T00:00:00Z"
+```
+
+## Response Format
+
+All data endpoints return a standardized envelope:
+
+```json
+{
+  "data": [
+    {
+      // actual data records
+    }
+  ],
+  "meta": {
+    "query": {
+      // your query parameters
+    },
+    "count": 123,
+    "source": "NOAA CO-OPS",
+    "credits": "Data attribution",
+    "next": null
+  }
+}
+```
+
+## Error Handling
+
+Errors follow a consistent format:
+
+```json
+{
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "Rate limit exceeded for free plan",
+    "hint": "Upgrade your plan for higher limits"
+  }
+}
+```
+
+Common status codes:
+
+- `200` - Success
+- `400` - Bad request (invalid parameters)
+- `401` - Unauthorized (missing or invalid API key)
+- `429` - Rate limit exceeded
+- `500` - Server error
+
+## Rate Limits
+
+Rate limits vary by plan:
+
+- **Free**: 30 requests per minute
+- **Pro**: 300 requests per minute
+- **Enterprise**: Custom limits
+
+Check response headers:
+
+```
+X-RateLimit-Limit: 30
+X-RateLimit-Remaining: 29
+```
+
+## Next Steps
+
+- <Link href="/pricing">View pricing plans</Link>
+- <Link href="/api/v1/tides">Explore API documentation</Link>
+- View interactive docs at [http://localhost:8080/docs](http://localhost:8080/docs)
+
+## Need Help?
+
+- Check the [OpenAPI documentation](http://localhost:8080/docs)
+- Review error messages and hints
+- Contact support@bluetrace.dev
+

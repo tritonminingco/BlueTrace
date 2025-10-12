@@ -1,0 +1,134 @@
+# Pricing
+
+Choose the plan that fits your needs. All plans include access to all datasets.
+
+<div className="grid grid-cols-1 md:grid-cols-3 gap-8 my-12">
+  {/* Free Plan */}
+  <div className="bg-white p-8 rounded-lg shadow-lg border-2 border-gray-200">
+    <h3 className="text-2xl font-bold mb-2">Free</h3>
+    <div className="text-4xl font-bold mb-4">$0<span className="text-lg text-gray-500">/mo</span></div>
+    
+    <ul className="space-y-3 mb-8">
+      <li className="flex items-start">
+        <span className="text-green-500 mr-2">✓</span>
+        <span>30 requests per minute</span>
+      </li>
+      <li className="flex items-start">
+        <span className="text-green-500 mr-2">✓</span>
+        <span>All datasets</span>
+      </li>
+      <li className="flex items-start">
+        <span className="text-green-500 mr-2">✓</span>
+        <span>Community support</span>
+      </li>
+      <li className="flex items-start">
+        <span className="text-green-500 mr-2">✓</span>
+        <span>OpenAPI documentation</span>
+      </li>
+    </ul>
+    
+    <button className="btn-secondary w-full">
+      Get Started
+    </button>
+  </div>
+
+  {/* Pro Plan */}
+  <div className="bg-white p-8 rounded-lg shadow-lg border-2 border-primary-500 relative">
+    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+      Most Popular
+    </div>
+    
+    <h3 className="text-2xl font-bold mb-2">Pro</h3>
+    <div className="text-4xl font-bold mb-4">$49<span className="text-lg text-gray-500">/mo</span></div>
+    <div className="text-sm text-gray-500 mb-4">+ metered usage</div>
+    
+    <ul className="space-y-3 mb-8">
+      <li className="flex items-start">
+        <span className="text-green-500 mr-2">✓</span>
+        <span>300 requests per minute</span>
+      </li>
+      <li className="flex items-start">
+        <span className="text-green-500 mr-2">✓</span>
+        <span>All datasets</span>
+      </li>
+      <li className="flex items-start">
+        <span className="text-green-500 mr-2">✓</span>
+        <span>Email support</span>
+      </li>
+      <li className="flex items-start">
+        <span className="text-green-500 mr-2">✓</span>
+        <span>Usage analytics</span>
+      </li>
+      <li className="flex items-start">
+        <span className="text-green-500 mr-2">✓</span>
+        <span>$0.001 per API call</span>
+      </li>
+    </ul>
+    
+    <button className="btn-primary w-full">
+      Start Pro Trial
+    </button>
+  </div>
+
+  {/* Enterprise Plan */}
+  <div className="bg-white p-8 rounded-lg shadow-lg border-2 border-gray-200">
+    <h3 className="text-2xl font-bold mb-2">Enterprise</h3>
+    <div className="text-4xl font-bold mb-4">Custom</div>
+    
+    <ul className="space-y-3 mb-8">
+      <li className="flex items-start">
+        <span className="text-green-500 mr-2">✓</span>
+        <span>Custom rate limits</span>
+      </li>
+      <li className="flex items-start">
+        <span className="text-green-500 mr-2">✓</span>
+        <span>All datasets</span>
+      </li>
+      <li className="flex items-start">
+        <span className="text-green-500 mr-2">✓</span>
+        <span>SLA guarantee</span>
+      </li>
+      <li className="flex items-start">
+        <span className="text-green-500 mr-2">✓</span>
+        <span>Priority support</span>
+      </li>
+      <li className="flex items-start">
+        <span className="text-green-500 mr-2">✓</span>
+        <span>Custom integrations</span>
+      </li>
+      <li className="flex items-start">
+        <span className="text-green-500 mr-2">✓</span>
+        <span>Volume discounts</span>
+      </li>
+    </ul>
+    
+    <button className="btn-secondary w-full">
+      Contact Sales
+    </button>
+  </div>
+</div>
+
+## Metered Billing
+
+Pro and Enterprise plans use metered billing through Stripe. You're charged based on actual API usage:
+
+- **Pro**: $0.001 per API call beyond base plan
+- **Enterprise**: Custom pricing based on volume
+
+## Fair Use Policy
+
+The Free plan is subject to fair use policies:
+
+- Maximum 43,200 requests per day
+- No commercial usage
+- Best effort availability
+
+## Questions?
+
+- All plans include access to all datasets (tides, SST, currents, turbidity, bathymetry)
+- Upgrade or downgrade anytime
+- Cancel anytime, no lock-in
+- Unused credits don't roll over
+
+Contact us at sales@bluetrace.dev for custom plans or questions.
+

@@ -1,0 +1,125 @@
+# Tides API
+
+Get water level measurements from tide stations.
+
+## Endpoint
+
+```
+GET /v1/tides
+```
+
+## Authentication
+
+Include your API key in the `X-Api-Key` header:
+
+```bash
+curl -H "X-Api-Key: YOUR_API_KEY" \
+  "http://localhost:8080/v1/tides?station_id=8454000&start=2024-01-01T00:00:00Z&end=2024-01-02T00:00:00Z"
+```
+
+## Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `station_id` | string | Yes | Station identifier |
+| `start` | string | Yes | Start datetime (ISO 8601) |
+| `end` | string | Yes | End datetime (ISO 8601) |
+| `limit` | integer | No | Max records (default: 1000, max: 10000) |
+
+## Response
+
+```json
+{
+  "data": [
+    {
+      "station_id": "8454000",
+      "time": "2024-01-01T00:00:00Z",
+      "water_level_m": 1.234
+    }
+  ],
+  "meta": {
+    "query": {
+      "station_id": "8454000",
+      "start": "2024-01-01T00:00:00Z",
+      "end": "2024-01-02T00:00:00Z",
+      "limit": 1000
+    },
+    "count": 1,
+    "source": "NOAA CO-OPS",
+    "credits": "Data provided by NOAA Center for Operational Oceanographic Products and Services",
+    "next": null
+  }
+}
+```
+
+## Fields
+
+- **station_id**: Unique station identifier
+- **time**: Measurement timestamp (UTC)
+- **water_level_m**: Water level in meters above datum
+
+## Demo Stations
+
+For testing, use these demo station IDs:
+
+- `DEMO001` - Demo Station 1
+- `DEMO002` - Demo Station 2
+- `DEMO003` - Demo Station 3
+
+## Examples
+
+### Get last 24 hours
+
+```bash
+curl -H "X-Api-Key: YOUR_API_KEY" \
+  "http://localhost:8080/v1/tides?station_id=DEMO001&start=2024-01-01T00:00:00Z&end=2024-01-02T00:00:00Z"
+```
+
+### Limit results
+
+```bash
+curl -H "X-Api-Key: YOUR_API_KEY" \
+  "http://localhost:8080/v1/tides?station_id=DEMO001&start=2024-01-01T00:00:00Z&end=2024-12-31T00:00:00Z&limit=100"
+```
+
+## Error Responses
+
+### Invalid datetime format
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid datetime format",
+    "hint": "Use ISO 8601 format (e.g., 2024-01-01T00:00:00Z)"
+  }
+}
+```
+
+### End before start
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "End time must be after start time"
+  }
+}
+```
+
+## Rate Limits
+
+- Free: 30 requests/minute
+- Pro: 300 requests/minute
+- Enterprise: Custom
+
+## Data Source
+
+Tides data is sourced from NOAA CO-OPS (Center for Operational Oceanographic Products and Services).
+
+## Related Endpoints
+
+- [Sea Surface Temperature](/api/v1/sst)
+- [Ocean Currents](/api/v1/currents)
+- [Turbidity](/api/v1/turbidity)
+

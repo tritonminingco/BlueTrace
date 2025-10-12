@@ -1,0 +1,90 @@
+import Link from 'next/link'
+
+# BlueTrace API
+
+## Marine & Coastal Data at Your Fingertips
+
+BlueTrace is a production-grade REST API that aggregates public marine and coastal datasets into a clean, queryable interface. Built for developers who need reliable ocean data.
+
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
+  <div className="bg-white p-6 rounded-lg shadow">
+    <h3 className="text-xl font-bold mb-2">🌊 Multiple Datasets</h3>
+    <p className="text-gray-600">Access tides, SST, currents, turbidity, and bathymetry data through a unified API.</p>
+  </div>
+  <div className="bg-white p-6 rounded-lg shadow">
+    <h3 className="text-xl font-bold mb-2">🔐 Secure & Metered</h3>
+    <p className="text-gray-600">API key authentication with usage tracking and rate limiting built in.</p>
+  </div>
+  <div className="bg-white p-6 rounded-lg shadow">
+    <h3 className="text-xl font-bold mb-2">📊 Production Ready</h3>
+    <p className="text-gray-600">Docker-based deployment with monitoring, logging, and automatic retries.</p>
+  </div>
+</div>
+
+## Quick Example
+
+```bash
+curl -H "X-Api-Key: YOUR_API_KEY" \
+  "http://localhost:8080/v1/tides?station_id=8454000&start=2024-01-01T00:00:00Z&end=2024-01-02T00:00:00Z"
+```
+
+Response:
+
+```json
+{
+  "data": [
+    {
+      "station_id": "8454000",
+      "time": "2024-01-01T00:00:00Z",
+      "water_level_m": 1.234
+    }
+  ],
+  "meta": {
+    "count": 1,
+    "source": "NOAA CO-OPS",
+    "credits": "Data provided by NOAA"
+  }
+}
+```
+
+## Available Endpoints
+
+- **Tides** - Water level measurements from tide stations
+- **SST** - Sea surface temperature data
+- **Currents** - Ocean current velocity vectors
+- **Turbidity** - Water clarity measurements
+- **Bathymetry** - Depth tiles for mapping
+
+<div className="flex gap-4 my-8">
+  <Link href="/quickstart" className="btn-primary">
+    Get Started
+  </Link>
+  <Link href="/pricing" className="btn-secondary">
+    View Pricing
+  </Link>
+</div>
+
+## Features
+
+### Developer Friendly
+
+- RESTful JSON API
+- OpenAPI/Swagger documentation
+- Comprehensive error messages
+- Standard response envelope
+
+### Reliable & Fast
+
+- Redis caching
+- Connection pooling
+- Automatic retries with backoff
+- Health checks
+
+### Flexible Plans
+
+Start free and scale as you grow. Pay only for what you use with metered billing through Stripe.
+
+<Link href="/quickstart" className="text-primary-600 hover:underline">
+  Read the Quickstart Guide →
+</Link>
+
