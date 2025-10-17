@@ -1,4 +1,4 @@
-# 🌊 BlueTrace
+# BlueTrace
 
 [![CI](https://github.com/yourusername/bluetrace/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/bluetrace/actions/workflows/ci.yml)
 [![Docker](https://github.com/yourusername/bluetrace/actions/workflows/docker.yml/badge.svg)](https://github.com/yourusername/bluetrace/actions/workflows/docker.yml)
@@ -11,16 +11,16 @@
 
 BlueTrace aggregates public marine and coastal datasets into a clean, queryable interface with API keys, usage metering, and paid tiers. Built for developers who need reliable ocean data.
 
-## ✨ Features
+## Features
 
-### 🎯 Core Capabilities
+### Core Capabilities
 - **Multiple Datasets**: Tides, SST, ocean currents, turbidity, and bathymetry
 - **Production Ready**: Docker-based deployment with monitoring and logging
 - **Developer Friendly**: OpenAPI/Swagger docs, standard REST patterns
 - **Secure**: API key authentication with HMAC hashing
 - **Metered Billing**: Stripe integration with usage-based pricing
 
-### 🔧 Technical Stack
+### Technical Stack
 - **Backend**: FastAPI + Python 3.11
 - **Database**: PostgreSQL 15 with SQLAlchemy 2.x + Alembic
 - **Cache/Queue**: Redis 7 + Dramatiq workers
@@ -28,7 +28,7 @@ BlueTrace aggregates public marine and coastal datasets into a clean, queryable 
 - **Observability**: OpenTelemetry with structured JSON logging
 - **Testing**: pytest with 90%+ coverage target
 
-### 🚀 Production Features
+### Production Features
 - Rate limiting with Redis sliding window
 - Background workers for data ingestion
 - Automatic retries with exponential backoff
@@ -36,14 +36,14 @@ BlueTrace aggregates public marine and coastal datasets into a clean, queryable 
 - CORS configuration
 - Comprehensive error handling
 
-## 📦 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Docker & Docker Compose
 - Python 3.11+ (for local development)
 - Node.js 20+ (for docs site)
 
-### 🐳 Run with Docker (Recommended)
+### Run with Docker (Recommended)
 
 ```bash
 # Clone the repository
@@ -64,7 +64,7 @@ docker-compose exec api poetry run python -m app.scripts.seed
 curl http://localhost:8080/v1/health
 ```
 
-### 💻 Local Development
+### Local Development
 
 ```bash
 # Backend
@@ -99,7 +99,7 @@ npm run dev
 # Visit http://localhost:3000
 ```
 
-## 🔑 API Usage
+## API Usage
 
 ### Get an API Key
 
@@ -153,7 +153,7 @@ All endpoints return a standardized envelope:
 }
 ```
 
-## 📚 Available Endpoints
+## Available Endpoints
 
 | Endpoint | Description |
 |----------|-------------|
@@ -168,7 +168,7 @@ All endpoints return a standardized envelope:
 
 **Interactive Docs**: http://localhost:8080/docs
 
-## 🛠️ Development
+## Development
 
 ### Makefile Commands
 
@@ -221,7 +221,7 @@ poetry run pre-commit install
 poetry run pre-commit run --all-files
 ```
 
-## 📊 Architecture
+## Architecture
 
 ```
 bluetrace/
@@ -248,7 +248,7 @@ bluetrace/
     └── workflows/       # CI/CD pipelines
 ```
 
-## 🎯 Rate Limits
+## Rate Limits
 
 | Plan | Requests/Minute | Price |
 |------|----------------|-------|
@@ -262,7 +262,7 @@ X-RateLimit-Limit: 30
 X-RateLimit-Remaining: 29
 ```
 
-## 🔒 Security
+## Security
 
 - API keys stored as HMAC-SHA256 hashes with salt
 - Keys never logged in full (only prefix)
@@ -272,7 +272,7 @@ X-RateLimit-Remaining: 29
 - SQL injection protection via SQLAlchemy
 - Input validation with Pydantic
 
-## 📈 Monitoring & Observability
+## Monitoring & Observability
 
 - Structured JSON logging
 - OpenTelemetry tracing
@@ -280,7 +280,7 @@ X-RateLimit-Remaining: 29
 - Database and Redis health checks
 - Prometheus metrics (planned)
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please:
 
@@ -298,24 +298,24 @@ Contributions are welcome! Please:
 - Add type hints (mypy strict mode)
 - Update documentation
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Data provided by NOAA (National Oceanic and Atmospheric Administration)
 - Built with FastAPI, PostgreSQL, Redis, and Next.js
 - Inspired by the need for accessible marine data APIs
 
-## 📞 Support
+## Support
 
 - **Documentation**: http://localhost:3000 (when running locally)
 - **Issues**: [GitHub Issues](https://github.com/yourusername/bluetrace/issues)
-- **Email**: support@bluetrace.dev
+- **Email**: contact@tritonmining.io
 - **Twitter**: [@BlueTraceAPI](https://twitter.com/BlueTraceAPI)
 
-## 🗺️ Roadmap
+## Roadmap
 
 - [ ] Additional data sources (GEBCO, Copernicus)
 - [ ] GraphQL API
@@ -328,5 +328,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ for ocean data enthusiasts and marine developers**
+**Built for ocean data enthusiasts and marine developers**
 
