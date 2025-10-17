@@ -1,8 +1,8 @@
 """NOAA CO-OPS tides ingester."""
-from datetime import datetime, timedelta
-from typing import Any, Dict, List
 
-from sqlalchemy import insert
+from datetime import datetime, timedelta
+from typing import Any
+
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,17 +19,17 @@ class TidesNOAAIngester(BaseIngester):
         """Initialize tides ingester."""
         super().__init__("tides_noaa")
 
-    async def fetch_data(self) -> List[Dict[str, Any]]:
+    async def fetch_data(self) -> list[dict[str, Any]]:
         """Fetch tides data from NOAA CO-OPS API."""
         all_data = []
-        
+
         # Fetch data for demo stations
         for station_id in self.DEMO_STATIONS:
             try:
                 # Get last 7 days of data
                 end_date = datetime.utcnow()
                 start_date = end_date - timedelta(days=7)
-                
+
                 url = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter"
                 params = {
                     "station": station_id,
@@ -40,51 +40,50 @@ class TidesNOAAIngester(BaseIngester):
                     "units": "metric",
                     "time_zone": "gmt",
                     "format": "json",
-                    "application": "bluetrace"
+                    "application": "bluetrace",
                 }
-                
+
                 data = await self.fetch_page(url, params)
                 all_data.append({"station_id": station_id, "data": data})
-                
+
             except Exception as e:
                 self.logger.warning(f"Failed to fetch data for station {station_id}: {str(e)}")
-        
+
         return all_data
 
-    async def transform(self, raw_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    async def transform(self, raw_data: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Transform NOAA tides data."""
         records = []
-        
+
         for station_data in raw_data:
             station_id = station_data["station_id"]
             data = station_data["data"]
-            
+
             if "data" not in data:
                 continue
-            
+
             for record in data["data"]:
                 try:
-                    records.append({
-                        "station_id": station_id,
-                        "time": datetime.strptime(record["t"], "%Y-%m-%d %H:%M"),
-                        "water_level_m": float(record["v"])
-                    })
+                    records.append(
+                        {
+                            "station_id": station_id,
+                            "time": datetime.strptime(record["t"], "%Y-%m-%d %H:%M"),
+                            "water_level_m": float(record["v"]),
+                        }
+                    )
                 except (KeyError, ValueError) as e:
                     self.logger.warning(f"Skipping invalid record: {e}")
-        
+
         return records
 
-    async def upsert(self, db: AsyncSession, records: List[Dict[str, Any]]) -> int:
+    async def upsert(self, db: AsyncSession, records: list[dict[str, Any]]) -> int:
         """Upsert tides records."""
         if not records:
             return 0
-        
+
         # Use PostgreSQL INSERT ... ON CONFLICT DO NOTHING for idempotency
         stmt = pg_insert(DatasetTides).values(records)
-        stmt = stmt.on_conflict_do_nothing(
-            index_elements=["station_id", "time"]
-        )
-        
+        stmt = stmt.on_conflict_do_nothing(index_elements=["station_id", "time"])
+
         await db.execute(stmt)
         return len(records)
-

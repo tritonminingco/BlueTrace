@@ -1,4 +1,5 @@
 """Dramatiq-based task scheduler."""
+
 import dramatiq
 from dramatiq.brokers.redis import RedisBroker
 
@@ -18,7 +19,7 @@ dramatiq.set_broker(redis_broker)
 def ingest_tides_task() -> None:
     """Task to ingest tides data."""
     import asyncio
-    
+
     logger.info("Starting tides ingestion task")
     ingester = TidesNOAAIngester()
     asyncio.run(ingester.run())
@@ -29,7 +30,7 @@ def ingest_tides_task() -> None:
 def ingest_turbidity_task() -> None:
     """Task to ingest turbidity data."""
     import asyncio
-    
+
     logger.info("Starting turbidity ingestion task")
     ingester = TurbidityDemoIngester()
     asyncio.run(ingester.run())
@@ -39,10 +40,9 @@ def ingest_turbidity_task() -> None:
 def schedule_all_tasks() -> None:
     """Schedule all ingestion tasks."""
     logger.info("Scheduling ingestion tasks")
-    
+
     # Send tasks to queue
     ingest_tides_task.send()
     ingest_turbidity_task.send()
-    
-    logger.info("All tasks scheduled")
 
+    logger.info("All tasks scheduled")

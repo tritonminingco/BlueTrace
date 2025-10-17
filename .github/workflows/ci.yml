@@ -4,10 +4,10 @@ on:
   push:
     branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 jobs:
-  lint-and-test:
+  test:
     runs-on: ubuntu-latest
     
     services:
@@ -16,72 +16,81 @@ jobs:
         env:
           POSTGRES_USER: bluetrace
           POSTGRES_PASSWORD: bluetrace
-          POSTGRES_DB: bluetrace_test
-        ports:
-          - 5432:5432
+          POSTGRES_DB: bluetrace
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      
+        ports:
+          - 5432:5432
+          
       redis:
         image: redis:7-alpine
-        ports:
-          - 6379:6379
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          - 6379:6379
 
     steps:
     - uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-    
+        
     - name: Install Poetry
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
-    
-    - name: Cache dependencies
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+        
+    - name: Load cached venv
+      id: cached-poetry-dependencies
       uses: actions/cache@v3
       with:
-        path: ~/.cache/pypoetry
-        key: ${{ runner.os }}-poetry-${{ hashFiles('backend/pyproject.toml') }}
-    
+        path: backend/.venv
+        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+        
     - name: Install dependencies
-      working-directory: ./backend
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      working-directory: backend
+      run: poetry install --no-interaction --no-root
+      
+    - name: Install project
+      working-directory: backend
+      run: poetry install --no-interaction
+      
+    - name: Run linting
+      working-directory: backend
       run: |
-        poetry config virtualenvs.create false
-        poetry install --no-interaction
-    
-    - name: Run linters
-      working-directory: ./backend
-      run: |
-        poetry run ruff check app tests
-        poetry run black --check app tests
-        poetry run mypy app || true
-    
+        poetry run black --check app/ tests/
+        poetry run ruff check app/ tests/ --fix
+        poetry run mypy app/
+        
     - name: Run tests
-      working-directory: ./backend
+      working-directory: backend
       env:
-        POSTGRES_DSN: postgresql://bluetrace:bluetrace@localhost:5432/bluetrace_test
+        POSTGRES_DSN: postgresql://bluetrace:bluetrace@localhost:5432/bluetrace
         REDIS_URL: redis://localhost:6379/0
-      run: |
-        poetry run pytest --cov=app --cov-report=xml --cov-report=term
-    
-    - name: Upload coverage
+        SECRET_KEY: test-secret-key
+        API_KEY_SALT: test-salt
+      run: poetry run pytest --cov=app --cov-report=xml --cov-fail-under=90
+      
+    - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
-        file: ./backend/coverage.xml
-        fail_ci_if_error: false
+        file: backend/coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: true
 
-  build-docs:
+  docs:
     runs-on: ubuntu-latest
     
     steps:
@@ -92,13 +101,16 @@ jobs:
       with:
         node-version: '20'
         cache: 'npm'
-        cache-dependency-path: docs/package.json
-    
+        cache-dependency-path: docs/package-lock.json
+        
     - name: Install dependencies
-      working-directory: ./docs
+      working-directory: docs
       run: npm ci
-    
-    - name: Build docs
-      working-directory: ./docs
+      
+    - name: Build documentation
+      working-directory: docs
       run: npm run build
-
+      
+    - name: Run linting
+      working-directory: docs
+      run: npm run lint

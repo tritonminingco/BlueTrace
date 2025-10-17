@@ -1,6 +1,7 @@
 """Water turbidity service."""
+
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,11 +17,11 @@ async def get_turbidity_data(
     max_lat: float,
     start: datetime,
     end: datetime,
-    limit: int = 1000
-) -> List[Dict[str, Any]]:
+    limit: int = 1000,
+) -> list[dict[str, Any]]:
     """
     Fetch turbidity data within a bounding box and time range.
-    
+
     Args:
         db: Database session
         min_lon: Minimum longitude
@@ -30,7 +31,7 @@ async def get_turbidity_data(
         start: Start datetime
         end: End datetime
         limit: Maximum number of records
-        
+
     Returns:
         List of turbidity records
     """
@@ -42,15 +43,15 @@ async def get_turbidity_data(
             DatasetTurbidity.lat >= min_lat,
             DatasetTurbidity.lat <= max_lat,
             DatasetTurbidity.time >= start,
-            DatasetTurbidity.time <= end
+            DatasetTurbidity.time <= end,
         )
         .order_by(DatasetTurbidity.time)
         .limit(limit)
     )
-    
+
     result = await db.execute(query)
     records = result.scalars().all()
-    
+
     return [
         {
             "lat": record.lat,
@@ -60,4 +61,3 @@ async def get_turbidity_data(
         }
         for record in records
     ]
-

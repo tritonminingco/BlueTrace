@@ -1,24 +1,25 @@
 """Main FastAPI application."""
-import time
-from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator
 
-from fastapi import FastAPI, Request, status
+import time
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+from typing import Any
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.api.v1 import admin, bathy, currents, health, sst, tides, turbidity
+from app.api.v1.stripe_webhook import router as stripe_router
 from app.core.config import settings
 from app.core.errors import (
-    BlueTraceException,
+    BlueTraceError,
     bluetrace_exception_handler,
     general_exception_handler,
-    http_exception_handler,
 )
 from app.core.logging import get_logger, setup_logging
 from app.core.rate_limit import rate_limiter
-from app.telemetry.otel import setup_telemetry, instrument_app
-from app.api.v1 import health, admin, tides, sst, currents, turbidity, bathy
-from app.api.v1.stripe_webhook import router as stripe_router
+from app.telemetry.otel import instrument_app, setup_telemetry
 
 # Setup logging
 setup_logging()
@@ -30,17 +31,17 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan manager."""
     # Startup
     logger.info("Starting BlueTrace API")
-    
+
     # Initialize rate limiter
     await rate_limiter.initialize()
     logger.info("Rate limiter initialized")
-    
+
     # Setup telemetry
     setup_telemetry()
     logger.info("Telemetry configured")
-    
+
     yield
-    
+
     # Shutdown
     logger.info("Shutting down BlueTrace API")
     await rate_limiter.close()
@@ -73,18 +74,18 @@ async def log_requests(request: Request, call_next: Any) -> JSONResponse:
     """Log all requests with structured data."""
     start_time = time.time()
     request_id = request.headers.get("X-Request-ID", f"req_{int(start_time * 1000)}")
-    
+
     # Process request
     response = await call_next(request)
-    
+
     # Calculate duration
     duration_ms = int((time.time() - start_time) * 1000)
-    
+
     # Extract API key prefix if available
     api_key_prefix = "anonymous"
     if hasattr(request.state, "api_key"):
         api_key_prefix = request.state.api_key.prefix
-    
+
     # Log request
     logger.info(
         "Request completed",
@@ -97,17 +98,17 @@ async def log_requests(request: Request, call_next: Any) -> JSONResponse:
             "duration_ms": duration_ms,
         },
     )
-    
+
     # Add headers
     response.headers["X-Request-ID"] = request_id
     response.headers["X-RateLimit-Limit"] = "30"  # Will be dynamic later
     response.headers["X-RateLimit-Remaining"] = "29"
-    
+
     return response
 
 
 # Exception handlers
-app.add_exception_handler(BlueTraceException, bluetrace_exception_handler)
+app.add_exception_handler(BlueTraceError, bluetrace_exception_handler)
 app.add_exception_handler(Exception, general_exception_handler)
 
 # Include routers
@@ -127,9 +128,4 @@ instrument_app(app)
 @app.get("/", include_in_schema=False)
 async def root() -> dict[str, str]:
     """Root endpoint."""
-    return {
-        "message": "BlueTrace API",
-        "docs": "/docs",
-        "version": "0.1.0"
-    }
-
+    return {"message": "BlueTrace API", "docs": "/docs", "version": "0.1.0"}

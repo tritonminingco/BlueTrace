@@ -1,4 +1,5 @@
 """Bathymetry tile API endpoints."""
+
 from fastapi import APIRouter, Depends, Path
 from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,22 +19,22 @@ async def get_bathy_tile_endpoint(
     x: int = Path(..., ge=0, description="Tile X coordinate"),
     y: int = Path(..., ge=0, description="Tile Y coordinate"),
     db: AsyncSession = Depends(get_db),
-    api_key: APIKey = Depends(get_current_api_key)
+    api_key: APIKey = Depends(get_current_api_key),
 ) -> Response:
     """
     Get a bathymetry tile image.
-    
+
     Returns a PNG tile for the specified coordinates.
     """
     # Fetch tile
     tile_data = await get_bathy_tile(db, z, x, y)
-    
+
     if not tile_data:
         raise NotFoundError(
             message=f"Tile not found: {z}/{x}/{y}",
-            hint="Check tile coordinates or request tile generation"
+            hint="Check tile coordinates or request tile generation",
         )
-    
+
     return Response(
         content=tile_data,
         media_type="image/png",
@@ -42,6 +43,5 @@ async def get_bathy_tile_endpoint(
             "X-Tile-Z": str(z),
             "X-Tile-X": str(x),
             "X-Tile-Y": str(y),
-        }
+        },
     )
-

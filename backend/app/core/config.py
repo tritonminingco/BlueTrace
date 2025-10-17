@@ -1,6 +1,7 @@
 """Configuration management using Pydantic Settings."""
+
 import json
-from typing import Any, Dict, List
+from typing import Any
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -19,18 +20,14 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="allow")
 
     # Database
-    POSTGRES_DSN: str = Field(
-        default="postgresql://bluetrace:bluetrace@localhost:5432/bluetrace"
-    )
+    POSTGRES_DSN: str = Field(default="postgresql://bluetrace:bluetrace@localhost:5432/bluetrace")
 
     # Redis
     REDIS_URL: str = Field(default="redis://localhost:6379/0")
 
     # API
     API_BASE_URL: str = Field(default="http://localhost:8080")
-    CORS_ORIGINS: List[str] = Field(
-        default=["http://localhost:3000", "http://localhost:8080"]
-    )
+    CORS_ORIGINS: list[str] = Field(default=["http://localhost:3000", "http://localhost:8080"])
     LOG_LEVEL: str = Field(default="INFO")
 
     # Stripe
@@ -42,7 +39,11 @@ class Settings(BaseSettings):
 
     # Rate Limits
     RATE_LIMITS_JSON: str = Field(
-        default='{"free": {"requests": 30, "window": 60}, "pro": {"requests": 300, "window": 60}, "enterprise": {"requests": 10000, "window": 60}}'
+        default=(
+            '{"free": {"requests": 30, "window": 60}, '
+            '"pro": {"requests": 300, "window": 60}, '
+            '"enterprise": {"requests": 10000, "window": 60}}'
+        )
     )
 
     # Admin
@@ -62,19 +63,16 @@ class Settings(BaseSettings):
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
-    def parse_cors_origins(cls, v: Any) -> List[str]:
+    def parse_cors_origins(cls, v: Any) -> list[str]:
         """Parse CORS origins from JSON string or list."""
         if isinstance(v, str):
             return json.loads(v)
         return v
 
-    def get_rate_limits(self) -> Dict[str, RateLimitConfig]:
+    def get_rate_limits(self) -> dict[str, RateLimitConfig]:
         """Parse and return rate limit configurations."""
         limits_dict = json.loads(self.RATE_LIMITS_JSON)
-        return {
-            plan: RateLimitConfig(**config) for plan, config in limits_dict.items()
-        }
+        return {plan: RateLimitConfig(**config) for plan, config in limits_dict.items()}
 
 
 settings = Settings()
-

@@ -1,7 +1,8 @@
 """Structured logging configuration."""
+
 import logging
 import sys
-from typing import Any, Dict
+from typing import Any
 
 from pythonjsonlogger import jsonlogger
 
@@ -12,7 +13,7 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
     """Custom JSON formatter with additional fields."""
 
     def add_fields(
-        self, log_record: Dict[str, Any], record: logging.LogRecord, message_dict: Dict[str, Any]
+        self, log_record: dict[str, Any], record: logging.LogRecord, message_dict: dict[str, Any]
     ) -> None:
         """Add custom fields to log records."""
         super().add_fields(log_record, record, message_dict)
@@ -41,4 +42,3 @@ def setup_logging() -> None:
 def get_logger(name: str) -> logging.Logger:
     """Get a logger instance."""
     return logging.getLogger(name)
-

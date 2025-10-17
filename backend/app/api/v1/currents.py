@@ -1,6 +1,7 @@
 """Ocean currents API endpoints."""
+
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,11 +21,11 @@ async def get_currents(
     time: str = Query(..., description="Target datetime (ISO format)"),
     limit: int = Query(1000, ge=1, le=10000, description="Maximum records"),
     db: AsyncSession = Depends(get_db),
-    api_key: APIKey = Depends(get_current_api_key)
-) -> Dict[str, Any]:
+    api_key: APIKey = Depends(get_current_api_key),
+) -> dict[str, Any]:
     """
     Get ocean currents data within a bounding box.
-    
+
     Returns current velocity (u, v components) at the specified time.
     """
     # Parse bbox
@@ -36,33 +37,28 @@ async def get_currents(
     except ValueError:
         raise ValidationError(
             message="Invalid bounding box format",
-            hint="Use format: minLon,minLat,maxLon,maxLat (e.g., -75,38,-74,39)"
+            hint="Use format: minLon,minLat,maxLon,maxLat (e.g., -75,38,-74,39)",
         )
-    
+
     # Parse datetime
     try:
         time_dt = datetime.fromisoformat(time.replace("Z", "+00:00"))
     except ValueError:
         raise ValidationError(
             message="Invalid datetime format",
-            hint="Use ISO 8601 format (e.g., 2024-01-01T12:00:00Z)"
+            hint="Use ISO 8601 format (e.g., 2024-01-01T12:00:00Z)",
         )
-    
+
     # Fetch data
     data = await get_currents_data(db, min_lon, min_lat, max_lon, max_lat, time_dt, limit)
-    
+
     return {
         "data": data,
         "meta": {
-            "query": {
-                "bbox": bbox,
-                "time": time,
-                "limit": limit
-            },
+            "query": {"bbox": bbox, "time": time, "limit": limit},
             "count": len(data),
             "source": "Demo Dataset",
             "credits": "Demonstration data for BlueTrace MVP",
-            "next": None
-        }
+            "next": None,
+        },
     }
-

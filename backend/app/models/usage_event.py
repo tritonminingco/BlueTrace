@@ -1,4 +1,5 @@
 """Usage event model for metering."""
+
 from sqlalchemy import BigInteger, ForeignKey, Index, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -24,4 +25,3 @@ class UsageEvent(Base, TimestampMixin):
         Index("idx_usage_events_api_key_created", "api_key_id", "created_at"),
         Index("idx_usage_events_route_created", "route", "created_at"),
     )
-

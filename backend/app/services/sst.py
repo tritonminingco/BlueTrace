@@ -1,6 +1,7 @@
 """Sea surface temperature service."""
+
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,11 +16,11 @@ async def get_sst_data(
     start: datetime,
     end: datetime,
     radius: float = 0.5,
-    limit: int = 1000
-) -> List[Dict[str, Any]]:
+    limit: int = 1000,
+) -> list[dict[str, Any]]:
     """
     Fetch SST data near a location within a time range.
-    
+
     Args:
         db: Database session
         lat: Latitude
@@ -28,7 +29,7 @@ async def get_sst_data(
         end: End datetime
         radius: Search radius in degrees
         limit: Maximum number of records
-        
+
     Returns:
         List of SST records
     """
@@ -40,15 +41,15 @@ async def get_sst_data(
             DatasetSST.lon >= lon - radius,
             DatasetSST.lon <= lon + radius,
             DatasetSST.time >= start,
-            DatasetSST.time <= end
+            DatasetSST.time <= end,
         )
         .order_by(DatasetSST.time)
         .limit(limit)
     )
-    
+
     result = await db.execute(query)
     records = result.scalars().all()
-    
+
     return [
         {
             "lat": record.lat,
@@ -58,4 +59,3 @@ async def get_sst_data(
         }
         for record in records
     ]
-

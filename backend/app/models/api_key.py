@@ -1,6 +1,6 @@
 """API Key model."""
+
 from datetime import datetime
-from typing import Optional
 
 from sqlalchemy import DateTime, Index, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -21,9 +21,9 @@ class APIKey(Base, TimestampMixin):
     plan: Mapped[str] = mapped_column(
         String(50), nullable=False, default="free", index=True
     )  # free, pro, enterprise
-    stripe_customer_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    stripe_subscription_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    revoked_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    stripe_customer_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    stripe_subscription_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     __table_args__ = (
         Index("idx_api_keys_prefix_revoked", "prefix", "revoked_at"),
@@ -33,4 +33,3 @@ class APIKey(Base, TimestampMixin):
     def is_active(self) -> bool:
         """Check if the API key is active."""
         return self.revoked_at is None
-

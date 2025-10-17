@@ -5,7 +5,7 @@ from fastapi import HTTPException, Request, status
 from fastapi.responses import JSONResponse
 
 
-class BlueTraceException(Exception):
+class BlueTraceError(Exception):
     """Base exception for BlueTrace application."""
 
     def __init__(
@@ -14,7 +14,7 @@ class BlueTraceException(Exception):
         message: str,
         hint: Optional[str] = None,
         status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR,
-    ):
+    ): 
         self.code = code
         self.message = message
         self.hint = hint
@@ -22,7 +22,7 @@ class BlueTraceException(Exception):
         super().__init__(message)
 
 
-class AuthenticationError(BlueTraceException):
+class AuthenticationError(BlueTraceError):
     """Authentication failed."""
 
     def __init__(self, message: str = "Invalid or missing API key", hint: Optional[str] = None):
@@ -34,7 +34,7 @@ class AuthenticationError(BlueTraceException):
         )
 
 
-class RateLimitError(BlueTraceException):
+class RateLimitError(BlueTraceError):
     """Rate limit exceeded."""
 
     def __init__(self, message: str = "Rate limit exceeded", hint: Optional[str] = None):
@@ -46,7 +46,7 @@ class RateLimitError(BlueTraceException):
         )
 
 
-class ValidationError(BlueTraceException):
+class ValidationError(BlueTraceError):
     """Input validation failed."""
 
     def __init__(self, message: str, hint: Optional[str] = None):
@@ -58,7 +58,7 @@ class ValidationError(BlueTraceException):
         )
 
 
-class NotFoundError(BlueTraceException):
+class NotFoundError(BlueTraceError):
     """Resource not found."""
 
     def __init__(self, message: str = "Resource not found", hint: Optional[str] = None):
@@ -78,7 +78,7 @@ def create_error_response(code: str, message: str, hint: Optional[str] = None) -
     return {"error": error_body}
 
 
-async def bluetrace_exception_handler(request: Request, exc: BlueTraceException) -> JSONResponse:
+async def bluetrace_exception_handler(request: Request, exc: BlueTraceError) -> JSONResponse:
     """Handle BlueTrace exceptions."""
     return JSONResponse(
         status_code=exc.status_code,

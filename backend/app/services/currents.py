@@ -1,6 +1,7 @@
 """Ocean currents service."""
+
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,11 +16,11 @@ async def get_currents_data(
     max_lon: float,
     max_lat: float,
     time: datetime,
-    limit: int = 1000
-) -> List[Dict[str, Any]]:
+    limit: int = 1000,
+) -> list[dict[str, Any]]:
     """
     Fetch currents data within a bounding box at a specific time.
-    
+
     Args:
         db: Database session
         min_lon: Minimum longitude
@@ -28,7 +29,7 @@ async def get_currents_data(
         max_lat: Maximum latitude
         time: Target datetime
         limit: Maximum number of records
-        
+
     Returns:
         List of currents records
     """
@@ -39,14 +40,14 @@ async def get_currents_data(
             DatasetCurrents.lon <= max_lon,
             DatasetCurrents.lat >= min_lat,
             DatasetCurrents.lat <= max_lat,
-            DatasetCurrents.time == time
+            DatasetCurrents.time == time,
         )
         .limit(limit)
     )
-    
+
     result = await db.execute(query)
     records = result.scalars().all()
-    
+
     return [
         {
             "lat": record.lat,
@@ -57,4 +58,3 @@ async def get_currents_data(
         }
         for record in records
     ]
-
